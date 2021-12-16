@@ -112,6 +112,7 @@ function calculateMeterVolumeForSources(remoteKey, audioContextIndex) {
     if (graphQLData.mute[remoteKey].mute) {
       outputVolume.outputLeft = 0
     } else {
+      // console.log('meter value: ', meter[remoteKey].volume[0])
       outputVolume.outputLeft +=
         ((getGainInPercentage(
           graphQLData.sliderPosition[remoteKey].sliderPosition
@@ -129,9 +130,11 @@ function calculateMeterVolumeForSources(remoteKey, audioContextIndex) {
           ) *
           graphQLData.pan[remoteKey].pan) /
           100) *
-        meter[remoteKey].volume[0]
+        meter[remoteKey].volume[1]
     }
   }
+  // outputVolume.outputLeft = 0.0068789863586425784
+  // outputVolume.outputRight = 0.0068789863586425784
   return outputVolume
 }
 
@@ -151,7 +154,7 @@ function drawLoop(remoteKey) {
     meterList.volume[1] = outputVolume.outputRight
   }
 
-  if (graphQLData.sliderPosition[remoteKey].sliderPosition !== 0) {
+  if (graphQLData && graphQLData.sliderPosition[remoteKey].sliderPosition !== 0) {
     let volumeLeft = outputVolume.outputLeft
     let volumeRight = outputVolume.outputRight
 
@@ -199,12 +202,12 @@ function createAudioMeter(audioContext, clipLevel, averaging, clipLag) {
 
 function volumeAudioProcess(event) {
   var self = this
-  var buf = event.inputBuffer.getChannelData(0)
-  var bufLength = buf.length
+  // var buf = event.inputBuffer.getChannelData(0)
+  // var bufLength = buf.length
   var x = 0
   for (var i = 0; i < event.inputBuffer.numberOfChannels; i++) {
-    buf = event.inputBuffer.getChannelData(i)
-    bufLength = buf.length
+    var buf = event.inputBuffer.getChannelData(i)
+    var bufLength = buf.length
     for (var j = 0; j < bufLength; j++) {
       var sum = 0
       x = buf[j]
